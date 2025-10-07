@@ -1,0 +1,166 @@
+<div class="dashboard-container">
+  <div class="page-header">
+    <h1 class="page-title">Dashboard Overview</h1>
+    <p class="page-subtitle">Real-time statistics and district-wise staff distribution</p>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <mat-card class="stat-card stat-card-blue">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">Total Sanctioned Posts</div>
+          <div class="stat-value">{{ stats.totalSanctionedPosts | number }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-card-green">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>people</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">Total Filled Posts</div>
+          <div class="stat-value">{{ stats.totalFilledPosts | number }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-card-red">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>error_outline</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">Total Vacant Posts</div>
+          <div class="stat-value">{{ stats.totalVacantPosts | number }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-card-purple">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>swap_horiz</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">Transfers in Process</div>
+          <div class="stat-value">{{ stats.transfersInProcess | number }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-card-yellow">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>assessment</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">Attendance % (Today)</div>
+          <div class="stat-value">{{ stats.attendancePercentage | number:'1.1-1' }}%</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- District Distribution -->
+  <div class="districts-section">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Sindh Districts - Staff Distribution</mat-card-title>
+        <mat-card-subtitle>Overview of staff allocation across all districts</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="districts-grid">
+          @for (district of districts; track district.name; let i = $index) {
+            <div class="district-card" [style.border-left-color]="getDistrictColor(i)">
+              <div class="district-header">
+                <h3 class="district-name">{{ district.name }}</h3>
+                <span class="district-badge" [ngClass]="{
+                  'badge-success': getDistrictStatus(district) === 'Excellent',
+                  'badge-info': getDistrictStatus(district) === 'Good',
+                  'badge-warning': getDistrictStatus(district) === 'Average',
+                  'badge-danger': getDistrictStatus(district) === 'Critical'
+                }">{{ getDistrictStatus(district) }}</span>
+              </div>
+              
+              <div class="district-stats">
+                <div class="district-stat">
+                  <div class="stat-icon-small" style="background-color: rgba(76, 175, 80, 0.1)">
+                    <mat-icon style="color: #4caf50">check_circle</mat-icon>
+                  </div>
+                  <div>
+                    <div class="stat-value-small">{{ district.filledPosts }}</div>
+                    <div class="stat-label-small">Filled Posts</div>
+                  </div>
+                </div>
+
+                <div class="district-stat">
+                  <div class="stat-icon-small" style="background-color: rgba(244, 67, 54, 0.1)">
+                    <mat-icon style="color: #f44336">cancel</mat-icon>
+                  </div>
+                  <div>
+                    <div class="stat-value-small">{{ district.vacantPosts }}</div>
+                    <div class="stat-label-small">Vacant Posts</div>
+                  </div>
+                </div>
+
+                <div class="district-stat">
+                  <div class="stat-icon-small" style="background-color: rgba(156, 39, 176, 0.1)">
+                    <mat-icon style="color: #9c27b0">sync</mat-icon>
+                  </div>
+                  <div>
+                    <div class="stat-value-small">{{ district.transferPending }}</div>
+                    <div class="stat-label-small">Transfer Pending</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="district-total">
+                <span>Total Staff: <strong>{{ district.totalStaff }}</strong></span>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Quick Actions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="actions-grid">
+          <button mat-raised-button color="primary" routerLink="/employees/add">
+            <mat-icon>person_add</mat-icon>
+            Add Employee
+          </button>
+          <button mat-raised-button color="accent" routerLink="/attendance/mark">
+            <mat-icon>check_circle</mat-icon>
+            Mark Attendance
+          </button>
+          <button mat-raised-button color="warn" routerLink="/leave/apply">
+            <mat-icon>event_busy</mat-icon>
+            Apply Leave
+          </button>
+          <button mat-raised-button routerLink="/transfers/add">
+            <mat-icon>swap_horiz</mat-icon>
+            Request Transfer
+          </button>
+          <button mat-raised-button routerLink="/reports">
+            <mat-icon>assessment</mat-icon>
+            View Reports
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+

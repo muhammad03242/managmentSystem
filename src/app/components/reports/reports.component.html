@@ -1,0 +1,259 @@
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Reports & Analytics</h1>
+      <p class="page-subtitle">Comprehensive reports for attendance and district-wise analysis</p>
+    </div>
+    <div class="action-buttons">
+      <button mat-raised-button (click)="printReport()">
+        <mat-icon>print</mat-icon>
+        Print
+      </button>
+    </div>
+  </div>
+
+  <mat-tab-group class="reports-tabs">
+    <!-- Attendance Report Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>event</mat-icon>
+        Attendance Report
+      </ng-template>
+      
+      <div class="tab-content">
+        <mat-card class="report-card">
+          <mat-card-header>
+            <mat-card-title>Daily Attendance Report (Last 7 Days)</mat-card-title>
+            <div class="header-actions">
+              <button mat-raised-button color="primary" (click)="exportAttendanceReport()">
+                <mat-icon>download</mat-icon>
+                Export
+              </button>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="table-container">
+              <table mat-table [dataSource]="attendanceReports" class="report-table">
+                <!-- Date Column -->
+                <ng-container matColumnDef="date">
+                  <th mat-header-cell *matHeaderCellDef> Date </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <strong>{{ report.date | date:'EEE, MMM dd, yyyy' }}</strong>
+                  </td>
+                </ng-container>
+
+                <!-- Total Employees Column -->
+                <ng-container matColumnDef="totalEmployees">
+                  <th mat-header-cell *matHeaderCellDef> Total Employees </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    {{ report.totalEmployees }}
+                  </td>
+                </ng-container>
+
+                <!-- Present Column -->
+                <ng-container matColumnDef="present">
+                  <th mat-header-cell *matHeaderCellDef> Present </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <span class="status-badge present">{{ report.present }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Absent Column -->
+                <ng-container matColumnDef="absent">
+                  <th mat-header-cell *matHeaderCellDef> Absent </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <span class="status-badge absent">{{ report.absent }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Late Column -->
+                <ng-container matColumnDef="late">
+                  <th mat-header-cell *matHeaderCellDef> Late </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <span class="status-badge late">{{ report.late }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Percentage Column -->
+                <ng-container matColumnDef="percentage">
+                  <th mat-header-cell *matHeaderCellDef> Attendance % </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <span class="percentage-badge" [ngClass]="getAttendanceColor(report.percentage)">
+                      {{ report.percentage | number:'1.1-1' }}%
+                    </span>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="attendanceColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: attendanceColumns;"></tr>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+          <mat-card class="summary-card">
+            <mat-card-content>
+              <div class="summary-icon" style="background-color: #e8f5e9;">
+                <mat-icon style="color: #4caf50;">trending_up</mat-icon>
+              </div>
+              <div class="summary-info">
+                <div class="summary-label">Average Attendance</div>
+                <div class="summary-value">
+                  {{ getAverageAttendance() | number:'1.1-1' }}%
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="summary-card">
+            <mat-card-content>
+              <div class="summary-icon" style="background-color: #e3f2fd;">
+                <mat-icon style="color: #2196f3;">people</mat-icon>
+              </div>
+              <div class="summary-info">
+                <div class="summary-label">Total Records</div>
+                <div class="summary-value">
+                  {{ getTotalRecords() }}
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="summary-card">
+            <mat-card-content>
+              <div class="summary-icon" style="background-color: #fff3e0;">
+                <mat-icon style="color: #ff9800;">schedule</mat-icon>
+              </div>
+              <div class="summary-info">
+                <div class="summary-label">Total Late</div>
+                <div class="summary-value">
+                  {{ getTotalLate() }}
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- District Report Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>location_on</mat-icon>
+        District Report
+      </ng-template>
+      
+      <div class="tab-content">
+        <mat-card class="report-card">
+          <mat-card-header>
+            <mat-card-title>District-wise Staff Distribution & Attendance</mat-card-title>
+            <div class="header-actions">
+              <button mat-raised-button color="primary" (click)="exportDistrictReport()">
+                <mat-icon>download</mat-icon>
+                Export
+              </button>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="table-container">
+              <table mat-table [dataSource]="districtReports" class="report-table">
+                <!-- District Column -->
+                <ng-container matColumnDef="district">
+                  <th mat-header-cell *matHeaderCellDef> District </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <div class="district-name">
+                      <mat-icon>location_on</mat-icon>
+                      <strong>{{ report.district }}</strong>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Total Staff Column -->
+                <ng-container matColumnDef="totalStaff">
+                  <th mat-header-cell *matHeaderCellDef> Total Staff </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    {{ report.totalStaff }}
+                  </td>
+                </ng-container>
+
+                <!-- Present Column -->
+                <ng-container matColumnDef="present">
+                  <th mat-header-cell *matHeaderCellDef> Present Today </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <span class="status-badge present">{{ report.present }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Absent Column -->
+                <ng-container matColumnDef="absent">
+                  <th mat-header-cell *matHeaderCellDef> Absent Today </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <span class="status-badge absent">{{ report.absent }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- On Leave Column -->
+                <ng-container matColumnDef="onLeave">
+                  <th mat-header-cell *matHeaderCellDef> On Leave </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <span class="status-badge leave">{{ report.onLeave }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Attendance Rate Column -->
+                <ng-container matColumnDef="attendanceRate">
+                  <th mat-header-cell *matHeaderCellDef> Attendance Rate </th>
+                  <td mat-cell *matCellDef="let report"> 
+                    <span class="percentage-badge" [ngClass]="getAttendanceColor(report.attendanceRate)">
+                      {{ report.attendanceRate | number:'1.1-1' }}%
+                    </span>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="districtColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: districtColumns;"></tr>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- District Summary -->
+        <div class="district-summary">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>District Summary</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="summary-stats">
+                <div class="stat-item">
+                  <mat-icon>business</mat-icon>
+                  <div>
+                    <strong>{{ districts.length }}</strong>
+                    <span>Total Districts</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <mat-icon>people</mat-icon>
+                  <div>
+                    <strong>{{ employees.length }}</strong>
+                    <span>Total Staff</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <mat-icon>location_city</mat-icon>
+                  <div>
+                    <strong>{{ getTopDistrict() }}</strong>
+                    <span>Highest Staff</span>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+

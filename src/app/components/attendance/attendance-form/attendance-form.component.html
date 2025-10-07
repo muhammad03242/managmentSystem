@@ -1,0 +1,107 @@
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Mark Attendance</h1>
+      <p class="page-subtitle">Record employee attendance for the day</p>
+    </div>
+    <button mat-button routerLink="/attendance">
+      <mat-icon>arrow_back</mat-icon>
+      Back to List
+    </button>
+  </div>
+
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="attendanceForm" (ngSubmit)="onSubmit()">
+        <div class="form-section">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Select Employee</mat-label>
+              <mat-select formControlName="employeeId" (selectionChange)="onEmployeeChange()">
+                @for (employee of employees; track employee.id) {
+                  <mat-option [value]="employee.id">
+                    {{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }} ({{ employee.designation }})
+                  </mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>person</mat-icon>
+              @if (attendanceForm.get('employeeId')?.hasError('required') && attendanceForm.get('employeeId')?.touched) {
+                <mat-error>Please select an employee</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Date</mat-label>
+              <input matInput [matDatepicker]="datePicker" formControlName="date">
+              <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+              <mat-datepicker #datePicker></mat-datepicker>
+              <mat-icon matPrefix>calendar_today</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status" (selectionChange)="onStatusChange()">
+                <mat-option value="Present">Present</mat-option>
+                <mat-option value="Absent">Absent</mat-option>
+                <mat-option value="Late">Late</mat-option>
+                <mat-option value="Half Day">Half Day</mat-option>
+                <mat-option value="Leave">Leave</mat-option>
+              </mat-select>
+              <mat-icon matPrefix>check_circle</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Check In Time</mat-label>
+              <input matInput formControlName="checkIn" placeholder="09:00 AM" type="time">
+              <mat-icon matPrefix>login</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Check Out Time</mat-label>
+              <input matInput formControlName="checkOut" placeholder="05:00 PM" type="time">
+              <mat-icon matPrefix>logout</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Remarks</mat-label>
+              <textarea matInput formControlName="remarks" rows="3" placeholder="Any additional notes or comments..."></textarea>
+              <mat-icon matPrefix>note</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-raised-button type="button" (click)="onCancel()">
+            <mat-icon>close</mat-icon>
+            Cancel
+          </button>
+          <button mat-raised-button color="primary" type="submit">
+            <mat-icon>check_circle</mat-icon>
+            Mark Attendance
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Quick Mark Present Section -->
+  <mat-card class="quick-mark-card">
+    <mat-card-header>
+      <mat-card-title>Quick Actions</mat-card-title>
+      <mat-card-subtitle>Mark all active employees as present for today</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="quick-info">
+        <mat-icon>info</mat-icon>
+        <p>This will mark all {{ employees.length }} active employees as present with default check-in time of 09:00 AM.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+

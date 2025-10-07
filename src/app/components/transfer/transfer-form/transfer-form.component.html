@@ -1,0 +1,133 @@
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Request Transfer</h1>
+      <p class="page-subtitle">Submit a transfer request for employee deployment</p>
+    </div>
+    <button mat-button routerLink="/transfers">
+      <mat-icon>arrow_back</mat-icon>
+      Back to List
+    </button>
+  </div>
+
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="transferForm" (ngSubmit)="onSubmit()">
+        <div class="form-section">
+          <h3 class="section-title">Employee Information</h3>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Select Employee</mat-label>
+              <mat-select formControlName="employeeId" (selectionChange)="onEmployeeChange()">
+                @for (employee of employees; track employee.id) {
+                  <mat-option [value]="employee.id">
+                    {{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }} 
+                    ({{ employee.designation }} - {{ employee.district }})
+                  </mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>person</mat-icon>
+              @if (transferForm.get('employeeId')?.hasError('required') && transferForm.get('employeeId')?.touched) {
+                <mat-error>Please select an employee</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          @if (selectedEmployee) {
+            <div class="employee-details">
+              <mat-icon>info</mat-icon>
+              <div class="details-content">
+                <p><strong>Current Designation:</strong> {{ selectedEmployee.designation }}</p>
+                <p><strong>Department:</strong> {{ selectedEmployee.department }}</p>
+                <p><strong>Employment Type:</strong> {{ selectedEmployee.employmentType }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Current Location</h3>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>From District</mat-label>
+              <input matInput formControlName="fromDistrict" readonly>
+              <mat-icon matPrefix>location_on</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>From City</mat-label>
+              <input matInput formControlName="fromCity" readonly>
+              <mat-icon matPrefix>location_city</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Transfer Destination</h3>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>To District</mat-label>
+              <mat-select formControlName="toDistrict" (selectionChange)="onToDistrictChange($event.value)">
+                @for (district of districts; track district) {
+                  <mat-option [value]="district">{{ district }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>location_on</mat-icon>
+              @if (transferForm.get('toDistrict')?.hasError('required') && transferForm.get('toDistrict')?.touched) {
+                <mat-error>Please select destination district</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>To City</mat-label>
+              <input matInput formControlName="toCity" placeholder="City">
+              <mat-icon matPrefix>location_city</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Transfer Date</mat-label>
+              <input matInput [matDatepicker]="transferPicker" formControlName="transferDate">
+              <mat-datepicker-toggle matSuffix [for]="transferPicker"></mat-datepicker-toggle>
+              <mat-datepicker #transferPicker></mat-datepicker>
+              <mat-icon matPrefix>calendar_today</mat-icon>
+              @if (transferForm.get('transferDate')?.hasError('required') && transferForm.get('transferDate')?.touched) {
+                <mat-error>Transfer date is required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Transfer Details</h3>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Reason for Transfer</mat-label>
+              <textarea matInput formControlName="reason" rows="4" placeholder="Please provide detailed reason for transfer request..."></textarea>
+              <mat-icon matPrefix>description</mat-icon>
+              @if (transferForm.get('reason')?.hasError('required') && transferForm.get('reason')?.touched) {
+                <mat-error>Reason is required</mat-error>
+              }
+              @if (transferForm.get('reason')?.hasError('minlength') && transferForm.get('reason')?.touched) {
+                <mat-error>Reason must be at least 10 characters</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-raised-button type="button" (click)="onCancel()">
+            <mat-icon>close</mat-icon>
+            Cancel
+          </button>
+          <button mat-raised-button color="primary" type="submit">
+            <mat-icon>send</mat-icon>
+            Submit Request
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+
